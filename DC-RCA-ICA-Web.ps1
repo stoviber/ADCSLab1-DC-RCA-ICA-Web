@@ -10,13 +10,6 @@
 # Globals
 $scriptlogFile = ".\DC-RCA-ICA-Web.log"
 
-#defining default parameter values, as these ones are the same for all the machines
-$PSDefaultParameterValues = @{
-    'Add-LabMachineDefinition:DomainName' = 'unsunglabs.internal'
-    'Add-LabMachineDefinition:Memory' = 800MB
-    'Add-LabMachineDefinition:OperatingSystem' = 'Windows Server 2016 Datacenter (Desktop Experience)'
-}
-
 ###################################################################################################
 # Log to the screen and record output to a file
 ###################################################################################################
@@ -30,8 +23,7 @@ Function Write-Log($message)
 ###################################################################################################
 # Log to the screen and record output to a file
 ###################################################################################################
-function Set-Networking{
-    
+function Set-LabNAT{
     # NAT Switch
     if (get-vmswitch -name "unsunglabsNAT")
     {
@@ -41,26 +33,10 @@ function Set-Networking{
     {
         Write-Log "Creating unsunglabsNAT switch."
         New-VMSwitch -Name "unsunglabsNAT" -SwitchType Internal
-    }
-    
-    #NAT IP address
-    if(Get-NetIPAddress -InterfaceAlias 'vEthernet (unsunglabsNAT)')
-    {
-        Write-Log "IP address for unsunglabsNAT switch already configured, skipping configuration."
-    }
-    else
-    {
+        
         Write-Log "Configuring IP address for unsunglabsNAT switch."
         New-NetIPAddress -IPAddress 10.10.20.1 -PrefixLength 24 -InterfaceAlias "vEthernet (unsunglabsNAT)"
-    }
-
-    # NAT Gateway
-    if (Get-NetNat -Name "unsunglabsNAT")
-    {
-        Write-Log "NAT gateway 'unsunglabsNAT' already exists, skipping creation."
-    }
-    else
-    {
+        
         Write-Log "Creating NAT gateway 'unsunglabsNAT'."
         New-NetNAT -Name "unsunglabsNAT" -InternalIPInterfaceAddressPrefix 10.10.20.0/24
     }
@@ -68,25 +44,36 @@ function Set-Networking{
 
 
 function Set-Lab{
+    $PSDefaultParameterValues = @{
+        'Add-LabMachineDefinition:DomainName' = 'unsunglabs.internal'
+        'Add-LabMachineDefinition:Memory' = 700MB
+        'Add-LabMachineDefinition:OperatingSystem' = 'Windows Server 2016 Datacenter (Desktop Experience)'
+    }
+
     New-LabDefinition -Name unsungLab1 -DefaultVirtualizationEngine HyperV -MaxMemory 700MB
     Set-LabInstallationCredential -Username UnsungAdmin -Password "Secret-2025"
-    Add-LabDomainDefinition -Name unaunglabs.internal -AdminUser UnsungAdmin -AdminPassword "Secret-2025"
+    Add-LabDomainDefinition -Name unsunglabs.internal -AdminUser UnsungAdmin -AdminPassword "Secret-2025"
     Add-LabVirtualNetworkDefinition -Name unsunglabsDomain -AddressSpace 10.10.10.0/24 
     Add-LabVirtualNetworkDefinition -Name unsunglabsInfrastructure -AddressSpace 10.10.12.0/24
     Add-LabVirtualNetworkDefinition -Name unsunglabsNat -AddressSpace 10.10.20.0/24
 
     $netAdapter = @()
-    $netAdapter += New-LabNetworkAdapterDefinition -VirtualSwitch caistealDomain -Ipv4Address 10.10.10.254
-    $netAdapter += New-LabNetworkAdapterDefinition -VirtualSwitch caistealInfrastructure -Ipv4Address 10.10.12.254
-    $netAdapter += New-LabNetworkAdapterDefinition -VirtualSwitch caistealNat -Ipv4Address 10.10.20.10 -Ipv4Gateway 10.10.20.1
+    $netAdapter += New-LabNetworkAdapterDefinition -VirtualSwitch unsunglabsDomain -Ipv4Address 10.10.10.254
+    $netAdapter += New-LabNetworkAdapterDefinition -VirtualSwitch unsunglabsInfrastructure -Ipv4Address 10.10.12.254
+    $netAdapter += New-LabNetworkAdapterDefinition -VirtualSwitch unsunglabsNat -Ipv4Address 10.10.20.10 -Ipv4Gateway 10.10.20.1
 
-    Add-LabMachineDefinition -Name ADDS01 -Roles RootDC -Network caistealDomain -Gateway 192.168.10.254
-    Add-LabMachineDefinition -Name RCA01  -Network caistealDomain -Gateway 192.168.10.254
-    Add-LabMachineDefinition -Name ICA01  -Network caistealDomain -Gateway 192.168.10.254
-    Add-LabMachineDefinition -Name WEB01 -Roles WebServer -Network caistealDomain -Gateway 192.168.10.254
+    Add-LabMachineDefinition -Name ADDS01 -Roles RootDC -Network unsunglabsDomain -Gateway 10.10.10.254 
+    Add-LabMachineDefinition -Name RCA01  -Roles '' -IsDomainJoined $false -Network unsunglabsDomain -Gateway 10.10.10.254
+    Add-LabMachineDefinition -Name ICA01  -Roles '' -IsDomainJoined $true -Network unsunglabsDomain -Gateway 10.10.10.254
+    Add-LabMachineDefinition -Name WEB01 -Roles WebServer -Network unsunglabsDomain -Gateway 10.10.10.254
+    Add-LabMachineDefinition -Name WEB02 -Roles WebServer -Network unsunglabsInfrastructure -Gateway 10.10.12.254
     Add-LabMachineDefinition -Name Route1 -Roles Routing -NetworkAdapter $netAdapter 
 
-    #Install-Lab
+    Install-Lab
 }
+
+
+Set-LabNAT
+Set-Lab
 
 Show-LabDeploymentSummary -Detailed

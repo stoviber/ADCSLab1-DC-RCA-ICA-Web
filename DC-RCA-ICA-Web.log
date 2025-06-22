@@ -1,0 +1,16 @@
+2025-06-22 20:22:37 : Creating unsunglabsNAT switch.
+2025-06-22 20:22:40 : IP address for unsunglabsNAT switch already configured, skipping configuration.
+2025-06-22 20:22:40 : Creating NAT gateway 'unsunglabsNAT'.
+2025-06-22 20:28:20 : unsunglabsNAT switch already exists, skipping creation.
+2025-06-22 20:28:30 : IP address for unsunglabsNAT switch already configured, skipping configuration.
+2025-06-22 20:32:22 : Creating unsunglabsNAT switch.
+2025-06-22 20:32:26 : Configuring IP address for unsunglabsNAT switch.
+2025-06-22 20:32:28 : Creating NAT gateway 'unsunglabsNAT'.
+2025-06-22 20:34:07 : unsunglabsNAT switch already exists, skipping creation.
+2025-06-22 20:36:48 : unsunglabsNAT switch already exists, skipping creation.
+2025-06-22 20:38:14 : unsunglabsNAT switch already exists, skipping creation.
+2025-06-22 20:39:28 : unsunglabsNAT switch already exists, skipping creation.
+2025-06-22 20:40:27 : unsunglabsNAT switch already exists, skipping creation.
+2025-06-22 21:14:19 : Creating unsunglabsNAT switch.
+2025-06-22 21:14:22 : Configuring IP address for unsunglabsNAT switch.
+2025-06-22 21:14:22 : Creating NAT gateway 'unsunglabsNAT'.
