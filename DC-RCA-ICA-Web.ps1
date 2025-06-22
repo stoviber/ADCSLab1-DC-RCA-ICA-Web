@@ -63,8 +63,8 @@ function Set-Lab{
     $netAdapter += New-LabNetworkAdapterDefinition -VirtualSwitch unsunglabsNat -Ipv4Address 10.10.20.10 -Ipv4Gateway 10.10.20.1
 
     Add-LabMachineDefinition -Name ADDS01 -Roles RootDC -Network unsunglabsDomain -Gateway 10.10.10.254 
-    Add-LabMachineDefinition -Name RCA01  -Roles '' -IsDomainJoined $false -Network unsunglabsDomain -Gateway 10.10.10.254
-    Add-LabMachineDefinition -Name ICA01  -Roles '' -IsDomainJoined $true -Network unsunglabsDomain -Gateway 10.10.10.254
+    Add-LabMachineDefinition -Name RCA01 -IsDomainJoined:$false -Network unsunglabsDomain -Gateway 10.10.10.254
+    Add-LabMachineDefinition -Name ICA01 -IsDomainJoined:$true -Network unsunglabsDomain -Gateway 10.10.10.254
     Add-LabMachineDefinition -Name WEB01 -Roles WebServer -Network unsunglabsDomain -Gateway 10.10.10.254
     Add-LabMachineDefinition -Name WEB02 -Roles WebServer -Network unsunglabsInfrastructure -Gateway 10.10.12.254
     Add-LabMachineDefinition -Name Route1 -Roles Routing -NetworkAdapter $netAdapter 
