@@ -1,6 +1,6 @@
 #####################################################################################################
 # Unsung Ltd Lab 1                                                                                  #
-# Version History : V1 - Stevie                                                                     #
+# Version History : V0.1 - Stevie                                                                     #
 # Pre-reqs - Assumption that AutomatedLab is installed and working                                  #
 # Uses hyper-v by default, believe you can drive vmware desktop and azure too if required.          #
 # It _should_ run on a machine with 16GB but might be a push, best on 32GB RAM                      #
